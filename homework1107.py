@@ -8,7 +8,7 @@ from hashlib import sha1
 
 
 conn = pymysql.Connect(host='127.0.0.1',user='root',password='123',port=3306,charset='utf8')
-cursor = conn.cursor()
+cursor = conn.cursor(pymysql.cursors.DictCursor)
 
 # 1.建库
 try:
@@ -40,7 +40,7 @@ try:
 except Exception as e:
     print(e)
 
-cursor.execute("use bbs")
+# cursor.execute("use bbs")
 
 # 3.输入信息并验证，验证通过则写入user表
 username0=input("请输入注册用户名：")
@@ -51,11 +51,16 @@ email0=input("请输入注册邮箱：")
 sql2 = "select username from user"
 sql3 = "insert into user(username,password,email) values('{}','{}','{}')"
 cursor.execute(sql2)
-print(cursor.fetchall())
+res = cursor.fetchall()
+print(res)
+tmp=[]
+for i in range(len(res)):
+    tmp += [res[i]['username']]
+print(tmp)
 try:
-    if (username0,) in cursor.fetchall():
+    if username0 in tmp:
         print('用户已经存在，请重新输入')
-    elif len(username0) <2:
+    elif len(username0) <=2:
         print('⽤户名⻓度必须⼤于2')
     elif str.isspace(username0):
         print('⽤户名不能为纯空格')
@@ -84,4 +89,3 @@ print(cursor.fetchall())
 
 cursor.close()
 conn.close()
-
